@@ -1,0 +1,61 @@
+import telebot
+from telebot import types
+import random
+
+bot = telebot.TeleBot('6093324846:AAFQWK-P-xkDmUOO8I-SysC14JFRqSfCeuE')
+
+boobs = open('D:\My_Creatyres\Bots\First_bot\images.png', 'rb') # Вот так вот и добавляются файлы боту, чтобы он мог с ними взаимодействовать. Бтв, нужно вторым аргументом писать способ открытия
+
+@bot.message_handler(commands=['start'])
+def start(message):
+    btns = types.ReplyKeyboardMarkup() # Кнопки, которые будут уже над клавиатурой, а не под сообщением
+    btn1 = types.KeyboardButton("Nix")
+    btn2 = types.KeyboardButton("Nix") # У кнопок в клавиатуре можно писать только название.
+    btn3 = types.KeyboardButton("Nix")
+    btn4 = types.KeyboardButton("Nix")
+    btns.row(btn1, btn2)
+    btns.row(btn3, btn4)
+
+    bot.send_message(message.chat.id, "Выкатываюсь", reply_markup=btns) # И даже чтобы создать кнопки в клавиатуре, нужно добавить их создаение к какому-либо сообщению
+
+    bot.register_next_step_handler(message, on_click) # Этот прикол сработает только один раз. Возобновить можно, если ещё раз отправить старт
+    # И бтв, если не сработает после некст сообщения (по условиям не пройдет, например) то всё равно попытка изчерпается, и придётся заново писать старт
+
+def on_click(message):
+    if message.text == "Nix":
+        bot.send_message(message.chat.id,"АЛЕКСАНДР ЛИТВИН!")
+
+    # Всё-таки, если ты в коде сначала отправишь кнопки, а потом их создашь, то логика помешает твоему плану)
+
+@bot.message_handler(content_types=['photo'])
+def photo(message):
+    btns = types.InlineKeyboardMarkup() # Этому будут принадлежать все кнопки, которые я дальше тут создам (в декораторе с фоткой)
+    btn1 = types.InlineKeyboardButton("Да, но можно лучше", callback_data="better")
+    btns.row(btn1)
+    btn2 = types.InlineKeyboardButton("Нет, говно, брат", callback_data="shit")
+    btn3 = types.InlineKeyboardButton("Ну, наверное", callback_data="doubt")
+    btns.row(btn2, btn3)
+    bot.reply_to(message, "Найс пикча мамбрат)", reply_markup = btns)
+
+@bot.callback_query_handler(func= lambda callback: True) # Декоратор, который будет обрабатывать все приколы с колбэк датой
+def callback_message(callback):
+    if callback.data == 'better': # Отлавливает конкретный колбэк, и делает с ним, что хочет
+        bot.edit_message_text('Леее, что за тигр этот лев', callback.message.chat.id, callback.message.message_id) # Первый аргумент: текст, который будет в сообщении после изменения
+    if callback.data == "shit":
+        bot.delete_message(callback.message.chat.id, callback.message.message_id - 1) # Второй: чат, третий: сообщение
+    elif callback.data == "doubt":
+        list = [1, 2]
+        res = random.choice(list) # Такой рандом, как будто в доту зашёл...
+        if res == 1:
+            bot.delete_message(callback.message.chat.id, callback.message.message_id - 1)
+        elif res == 2:
+            bot.send_message(callback.message.chat.id, "Да норм пичка брат, не сомневайся)" + str(res))
+
+@bot.message_handler(content_types=['text'])
+def get_text(message):
+     if message.text.lower() == "пришли пикчу": # V - значит lower, и ловер это функция, значит нужны скобочки в конце.
+        bot.send_photo(message.chat.id, boobs)
+    
+
+bot.polling(none_stop=True) # Не забывай
+# Бтв, ПОСЛЕ этой строки код не обрабатывается.

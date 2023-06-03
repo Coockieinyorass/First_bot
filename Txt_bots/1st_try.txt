@@ -1,0 +1,84 @@
+import telebot
+import sys
+from telebot import types # Чтобы кнопки создавать
+
+sys.path.append('D:\My_Creatyres\Bots\First_bot\загружено.png')
+
+bot = telebot.TeleBot('6093324846:AAFQWK-P-xkDmUOO8I-SysC14JFRqSfCeuE') # Тут мы обращаемся к классу телебот, внутри него в приколу по имени телебот, с помощью которого создаём токен для нашего бота
+# Бтв, чтобы создать бота, нужно в телеге написать BotFather'у, у него будет простая инструкция к тому, как создать бота, и он даст токен
+
+@bot.message_handler(commands=['but'])
+def start(message):
+
+    markup = types.InlineKeyboardMarkup() # "Самая простая кнопка"
+    markup.add(types.InlineKeyboardButton("Кнопка", url ="https://www.youtube.com/watch?v=HodO2eBEz_8")) # Тут сделали простейшую кнопку, первый аргумент - её название, второй - сайт, который будет открываться при нажатии
+    bot.send_message(message.chat.id, "Ну ничего, посмотрим как ты пачки дефать будешь", reply_markup=markup)
+
+#     # mess = f"Привет, {message.from_user.first_name} {message.from_user.last_name}"
+#     # bot.send_message(message.chat.id, mess) # Тут мы отправляем от имени бота сообщение, первый аргумент, это чат (мы сделали так, чтобы он отправлял сообщение в тот же чат, из которого была вызвана функция старт
+#     # второй аргумент, это, собственно, сообщение, которое отправит бот. Можно ещё добавить третий аргумент, "parse_mode = " и написать там что-то по типу html, и благодаря этому как-то форматировать текст, но пока не будем)
+
+# @bot.message_handler() # Бот ловит совершенно любое сообщение
+# def Answer(message): # Аргумент - сообщение пользователя
+#     if message.text == "Hello": # Ну и дальше просто расписываем логику
+#         bot.send_message(message.chat.id,"И тебе не хворать!") # Бтв, бот может не только текст отправлять, но и стикеры, документы и т.д.
+#     elif message.text == "Photo":
+#         photo = open('D:\My_Creatyres\Bots\First_bot\загружено.png', 'rb') # Добавили боту возможность отправить какое-то фото
+#         # О май гошь, он прочитал документацию на сайте, и понял, в чём ошибка, представляете?! Он просто указал путь к фото при помощи кнопки "Скопировать путь"
+#         bot.send_photo(message.chat.id, photo) # бот отправляет фото
+
+# А что если некорректно работает из-за этого? Тип Гоша говорил, что "работает некорректно, потому что есть вверху отдельный метод, который обрабатывает любые текстовые надписи"...
+# LFFFFFFFFFF ИЗ-ЗА НЕГО, ГОВНОЕД, И ИМЕННО ПОЭТОМУ ВЫШЕ НЕГО КОД РАБОТЕТ, А НИЖЕ НЕТ...
+# КРЧ, как я понял, выше чекает на but, не ловит, потом этот чекает, ловит, и не отправляет ничего в ответ, говноед.
+
+@bot.message_handler(content_types=['photo']) # Вот так вот и отлавливают разные форматы сообщений
+def photo_check(p):
+    bot.send_message(p.chat.id,"Найс пикча брат")
+
+    # Бтв, если юрл говно, то ничего, НИЧЕГО не сработает.
+
+@bot.message_handler(commands=['But'])
+def startq(message):
+
+    markup = types.InlineKeyboardMarkup() # Крч, тут мы создали кнопку
+    markup.add(types.InlineKeyboardButton("Кнопка", url="https://www.youtube.com/watch?v=fwXGbNcAJYo")) # Тут мы её закастомили
+    bot.send_message(message.chat.id, "Ну ничего, посмотрим как ты пачки дефать будешь", reply_markup=markup) # А тут мы её в конце отправили вместе с сообщением
+
+@bot.message_handler(commands=['help']) # Кнопки появятся только ПОСЛЕ отправки сообщения
+def button(message):
+    buttons = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1) # Эта кнопка будет в поле для ввода, а не под сообщением. Всё благодаря первому слову - Reply, а не InLine
+    # Бтв, первый аргумент для того, чтобы кнопки классно отображались на разный устройствах, второй орпеделяет, сколько их будет в одном ряду.
+    website = types.KeyboardButton('Веб сайт')
+    start = types.KeyboardButton('Старт')
+
+    buttons.add(website, start)
+    bot.send_message(message.chat.id, "Текстxd", reply_markup=buttons)
+
+bot.polling(none_stop = True) # Тут мы сделали так, чтобы бот работал на постоянке)
+
+# Бтв, есть всегда методичка на сайте, где ты скачал расширение. Так что, если беда, то тебе туда)
+
+# Что ещё можно скзаать из приколов... Ну, можно синергировать бота вместе с другими импортированными модулями. Например, он может открывать сайты по командам, благодаря модулю website.
+# Бтв можно круто кастомайзить бота у самого ботфазера, это сильно улучшит его во всех планах.
+# message.text.lover() - прикол, который ПРЕОБРАЗУЕТ текст в нижний регистр => его можно чекать внезависимости от регистра (Например, не надо будет делать миллион проверок на одно 
+# слово ПрИвЕт, с разными регистрами разных букв)
+
+
+import telebot
+from telebot import types
+import sys
+
+bot = telebot.TeleBot('6093324846:AAFQWK-P-xkDmUOO8I-SysC14JFRqSfCeuE')
+
+sys.path.append('D:\My_Creatyres\Bots\First_bot\загружено.png')
+
+# markup = types.InlineKeyboardMarkup() # Как я понял, впринципе добавляет механику кнопок в бота
+# markup.add(types.InlineKeyboardButton("Калькулятор от Ричарда Вотерсона", url="https://youtu.be/NWUculGu4eA")) # Через механику кнопок добавили кнопку, указав её место, и функцию
+
+@bot.message_handler(content_types=['photo'])
+def get_photo(message):
+    bot.reply_to(message, "Найс пикча брат)") # Ответ на присланное сообщение
+
+@bot.message_handler(commands=['start'])
+def start(message):
+    bot.send_message(message.chat.id, "Выкатываюсь")

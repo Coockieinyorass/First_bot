@@ -1,0 +1,58 @@
+import telebot
+from currency_converter import CurrencyConverter # Так написано в документации, что так надо импортировать
+from telebot import types
+
+bot = telebot.TeleBot("6093324846:AAFQWK-P-xkDmUOO8I-SysC14JFRqSfCeuE")
+currency = CurrencyConverter() # А ещё написано, что надо создать объект на основе этого класса
+
+amount = 0
+
+@bot.message_handler(commands=["start"])
+def start(message):
+    bot.send_message(message.chat.id, "Ку, введи сумму")
+    bot.register_next_step_handler(message, summa)
+
+def summa(message):
+    global amount
+    try:
+        amount = int(message.text.strip()) # Получили число от челика, и записали его в переменную
+    except(ValueError):
+        bot.reply_to(message, "Приятель, это не число. Напиши число")
+        bot.register_next_step_handler(message, summa)
+        return # Хз зачем, походу если не написать ретёрн тут, то код будет работать дальше. и наш отлов ошибки будет одноразовым, или что-то по типу того
+    
+    if amount > 0:
+        markup = types.InlineKeyboardMarkup(row_width=2) # Тут мы сразу указали, что в одном ряду будет максимум 2 кнопки\
+        btn1 = types.InlineKeyboardButton("USD/EUR", callback_data="usd/eur")
+        btn2 = types.InlineKeyboardButton("EUR/USD", callback_data="eur/usd")
+        btn3 = types.InlineKeyboardButton("USD/GBP", callback_data="usd/gbp")
+        btn4 = types.InlineKeyboardButton("Другое", callback_data="else")
+        markup.add(btn1, btn2, btn3, btn4) # Тут мы добавили в нашу панель кнопок сами кнопки
+        
+        bot.send_message(message.chat.id, "Выбери валюты", reply_markup=markup)
+    else:
+        bot.reply_to(message, "Да, давай я тебе сейчас сконвертирую это говно. Ну введи ты нормальное число")
+        bot.register_next_step_handler(message, summa)
+
+@bot.callback_query_handler(func = lambda call: True)
+def callback(call):
+    if call.data != "else":
+        values = call.data.upper().split("/") # Кол.дата - это текст в колле. Аппер - это верхний регистр, он нужен по условиям модуля каренси конвертер
+        res = currency.convert(amount, values[0], values[1]) # Лее, это что за конвертёр, детка!
+        bot.send_message(call.message.chat.id, f"Будет {round(res)}. Го некст")
+        bot.register_next_step_handler(call.message, summa)
+    else:
+        bot.send_message(call.message.chat.id, "Введи две валюты через слэш(/)")
+        bot.register_next_step_handler(call.message, my_currency) # Надо помнить, что писать некст степ надо, а не функцию добавлять в сенд месседж
+
+def my_currency(message):
+    try:
+        values = message.text.upper().split("/") 
+        res = currency.convert(amount, values[0], values[1]) 
+        bot.send_message(message.chat.id, f"Будет {round(res)}. Го некст")
+        bot.register_next_step_handler(message, summa)
+    except Exception: # Тут мы обрабатываем АБСОЛЮТНО любую ошибку
+        bot.reply_to(message, "Чёт ты хрень какую-то написал, давай по-новой, введи валюты опять")
+        bot.register_next_step_handler(message, my_currency)
+
+bot.polling(none_stop=True)

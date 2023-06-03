@@ -1,0 +1,33 @@
+import telebot
+import requests # Чтобы отправлять запросы по url адресам, и получать с них ответы
+import json # Я в шоке, ещё один модуль. Этот нужен, чтобы выводить данные в более приятном виде
+
+bot = telebot.TeleBot("6093324846:AAFQWK-P-xkDmUOO8I-SysC14JFRqSfCeuE")
+API = "c978317662b32e4b1d0f76546aebf156" # API, нужен, чтобы всё работало.
+
+@bot.message_handler(commands = ["start"])
+def start(message):
+    bot.send_message(message.chat.id, "Ку, кидай город")
+
+@bot.message_handler(content_types=["text"])
+def get_city(message):
+    city = message.text.strip().lower()
+    res = requests.get(f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API}&units=metric") # С помощью импортированного модуля обратились по url адресу, и получили ответ
+    if res.status_code == 200: # 200, при обработке url страницы, это всегда хорошо. Так что, если 200, значит всё норм
+        data = json.loads(res.text) # Тут мы берём весь текст из переменной res, при помощи соответсвующей функции, и преобразуем его при помощи функции из модуля json
+        # Бтв, там важно написать метод loads, а не load. Иначе будет говно
+        # bot.reply_to(message, f"Сейчас погода: {res.json()}") # Джейсон, это прикол, чтобы привести данные в какой-либо формат (мы выбрали json)
+        temp = data["main"]["temp"]
+        bot.reply_to(message, f'Температура {temp} градусов цельсия') # Прикол крч, если тут везде ставить одиннаковые кавычки, то будут говно-ошибки, так что стоит порой их чередовать)
+    
+        image = "images.png" if temp > 5.0 else "загружено.png"
+        file = open("./" + image, "rb") # Поняли прикол вообще? Составили адресную строку для файла при помощи переменной
+
+        bot.send_photo(message.chat.id, file)
+
+    else:
+        bot.reply_to(message, "Ты думаешь это город?")
+
+    
+    
+bot.polling(none_stop=True)
