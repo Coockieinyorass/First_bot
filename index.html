@@ -98,6 +98,17 @@
     </form>
     <script scr="https://telegram.org/js/telegram-web-app.js"></script>
     <!-- Код сверху даёт нам возможность работать круче. Чтобы понять как, нужно знать html и читать документацию -->
+    <script>
+        let tg = window.Telegram.WebApp;
+        let buy = document.getElementById("buy")
+        let order = document.getElementById("order")
+
+        buy.addEventListener("click", () => {
+            document.getElementById("main").style.display = "none";
+            document.getElementById("form").style.display = "block";
+            document.getElementById("user_name").value = tg.initDataUnsafe.first_name
+        })
+    </script>
 </body>
 </html>
 
