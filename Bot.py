@@ -6,8 +6,8 @@ dp = Dispatcher(bot)
 
 @dp.message_handler(commands=["start"])
 async def start(message: types.Message):
-    markup = types.ReplyKeyboardMarkup()
-    markup.add(types.KeyboardButton("Открыть веб страницу", web_app=WebAppInfo(url="https://coockieinyorass.github.io/First_bot/"))) # Тут мы указали, что при нажатии на кнопку
+    markup = types.InlineKeyboardMarkup() # Бтв прикол, данные пользователя будут подставляться, только при кнопке под сообщением. Через кнопку в клавиатуре не будут
+    markup.add(types.InlineKeyboardButton("Открыть веб страницу", web_app=WebAppInfo(url="https://coockieinyorass.github.io/First_bot/"))) # Тут мы указали, что при нажатии на кнопку
     # будет открываться веб-приложение + url для него. Url надо указывать в качетве аргумента!
 
     await message.answer("Ку, жми на кнопку!", reply_markup=markup)
