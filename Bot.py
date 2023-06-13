@@ -1,24 +1,18 @@
 from aiogram import Bot, Dispatcher, executor, types
-from aiogram.types.web_app_info import WebAppInfo # Чтобы делать веб-приложения
-import json
+import config
 
-bot = Bot("6093324846:AAFQWK-P-xkDmUOO8I-SysC14JFRqSfCeuE")
+bot = Bot(config.BOT_TOKEN) # Удобно
 dp = Dispatcher(bot)
 
 @dp.message_handler(commands=["start"])
 async def start(message: types.Message):
-    markup = types.InlineKeyboardMarkup() # Бтв прикол, данные пользователя будут подставляться, только при кнопке под сообщением. Через кнопку в клавиатуре не будут
-    markup.add(types.KeyboardButton("Открыть веб страницу", web_app=WebAppInfo(url="https://coockieinyorass.github.io/First_bot/"))) # Тут мы указали, что при нажатии на кнопку
-    # будет открываться веб-приложение + url для него. Url надо указывать в качетве аргумента!
-    # НО чтобы получать данные, нужно использовать Keyboard button, приколы крч
+    await bot.send_invoice(message.chat.id, 'Покупка курса', 'Покупка куроса itProgger', 'invoice', config.PAYMENT_TOKEN, 'USD', [types.LabeledPrice('Покупка курса', 5 * 100)]) 
+    # Там в конце типо 5 монет умножить на 100 = 5 долларов. 2 - название товара. 3 - описание товара, 4 - тип товара, 5 - ключ для подключения, 6 - валюта.
+    # 7 - список, составляющий из себя название товара, и его цену. А так эта функция принимает очень много параметров, а мы передали только обязательные
+    # Как же трахаться порой приходиться из-за Гошиных видео...
 
-    await message.answer("Ку, жми на кнопку!", reply_markup=markup)
-    # В результате открытия веб-приложения появился полноценные мини-браузер.
-    # Ё-маё... Гоша предложил создать своё веб-приложение при помощи html-файла... Походу я знаю, что буду учить дальше... (Вот это нативность конечно получилась)
-
-@dp.message_handler(content_types-=["web_app_data"])
-async def web_app(message: types.Message):
-    res = json.loads(message.web_app_data.data)
-    await message.answer(f'Name: {res["name"]}. Email: {res["email"]}. Phone: {res["phone"]}.')
+@dp.message_handler(content_types=types.ContentType.SUCCESSFUL_PAYMENT) # Этот прикол будет работать при успешной оплате
+async def succesful_payment(message: types.Message):
+    await message.answer(f'success: {message.successful_payment.order_info}') # Капец прикол, оч много инфы есть после оплаты.
 
 executor.start_polling(dp)
